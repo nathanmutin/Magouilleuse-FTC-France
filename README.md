@@ -39,6 +39,7 @@ x_{ij} \in \{0, 1\} & \forall i, j
 $$
 
 Ou sous forme matricielle :
+
 $$
 \begin{aligned}
 \underset{X \in \mathbb{R}^{n \times m}}{\text{minimiser}} \space & \text{tr}( C^T X) \\
