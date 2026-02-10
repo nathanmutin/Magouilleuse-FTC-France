@@ -29,7 +29,7 @@ Le problème d'optimisation peut être formulé de la manière suivante :
 
 $$
 \begin{aligned}
-\underset{X \in \mathbb{R}^{n \times m}}{\operatorname{minimiser}} \space &\sum_{i=1}^{n} \sum_{j=1}^{m} c_{ij} x_{ij} \\
+\underset{X \in \mathbb{R}^{n \times m}}{\text{minimiser}} \space &\sum_{i=1}^{n} \sum_{j=1}^{m} c_{ij} x_{ij} \\
 \text{tel que } &\begin{cases}
 \sum_{j=1}^{m} x_{ij} = 1 & \forall i \\
 8 \leq \sum_{i=1}^{n} x_{ij} \le 24 & \forall j \\
@@ -41,7 +41,7 @@ $$
 Ou sous forme matricielle :
 $$
 \begin{aligned}
-\underset{X \in \mathbb{R}^{n \times m}}{\operatorname{minimiser}} \space & tr( C^T X) \\
+\underset{X \in \mathbb{R}^{n \times m}}{\text{minimiser}} \space & \text{tr}( C^T X) \\
 \text{tel que } &\begin{cases}
 X \mathbf{1}_m = \mathbf{1}_n \\
 8 \times \mathbf{1}_m \leq X^T \mathbf{1}_n \le 24 \times \mathbf{1}_m \\
