@@ -1,6 +1,8 @@
 # Magouilleuse des compétitions FTC en France
 
-La Magouilleuse des compétitions vise à assigner chaque équipe FTC française à une compétition de manière optimale. L'objectif étant de minimiser l'insatisfaction des équipes tout en prenant en compte les temps de trajet vers les compétitions.
+La Magouilleuse des compétitions est un projet pour résoudre le problème d'assignation des équipes participant au [FIRST Tech Challenge (FTC) en France](https://www.robotiquefirstfrance.org/ftc/).
+
+Le projet vise à assigner chaque équipe FTC française à une compétition de manière optimale. L'objectif étant de minimiser l'insatisfaction des équipes tout en prenant en compte les temps de trajet vers les compétitions.
 
 ## Fonctionnement
 
@@ -62,6 +64,7 @@ Le coût d'assignation $c_{ij}$ doit refleter les principes énoncés précédem
 
 Chaque équipe classe les compétitions par ordre de préférence. L'insatisfaction est calculée en fonction du rang de la compétition dans la liste de préférences de l'équipe.
 L'insatisfaction est donnée par la formule suivante :
+
 $$\text{insatisfaction}(rang) = 2^{(rang - 1)}$$
 
 > [!NOTE]
@@ -74,7 +77,7 @@ $$\text{insatisfaction}(rang) = 2^{(rang - 1)}$$
 > | 3                  | 4              |
 > | 4                  | 8              |
 >
-> Cela signifie que les échanges suivants donnent des insatisfactions globales identiques :
+> Cela signifie que les échanges suivants se compensent et laissent l'insatisfaction globale inchangée :
 >
 > | Équipe A | Autres équipes |
 > |----------|----------------|
@@ -88,9 +91,10 @@ $$\text{insatisfaction}(rang) = 2^{(rang - 1)}$$
 Le temps de trajet entre l'équipe et la compétition est également pris en compte dans le coût d'assignation. Il est calculé pour un trajet en voiture entre les villes d'origine des équipes et les villes hôtes des compétitions. Le temps de trajet est normalisé et intégré dans le coût d'assignation de manière à favoriser les compétitions plus proches.
 
 La formule retenue pour la proximité est la suivante :
+
 $$\text{proximité}(i, j) = 2^{- \frac{\text{temps de trajet}(i, j)}{\tau}}$$
 
-Où $\tau$ est le temps choisi afin qu'ajouter $\tau$ heures de trajet divise la proximité par 2. Dans notre cas, nous avons choisi $\tau = 2 \text{h}$, ce qui signifie que chaque tranche de 2 heures de trajet réduit la proximité de moitié.
+Où $\tau$ est le temps choisi afin qu'ajouter $\tau$ heures de trajet divise la proximité par 2. Dans notre cas, nous avons choisi $\tau = 2 \text{h}$, ce qui signifie que chaque ajout de 2 heures de trajet réduit la proximité de moitié.
 
 | Temps de trajet entre l'équipe $i$ et la compétition $j$ | Proximité |
 |----------|----------------|
@@ -105,6 +109,7 @@ Où $\tau$ est le temps choisi afin qu'ajouter $\tau$ heures de trajet divise la
 ### Coût d'assignation
 
 Le coût d'assignation $c_{ij}$ est calculé en combinant l'insatisfaction et la proximité de la manière suivante :
+
 $$c_{ij} = \text{insatisfaction}(\text{rang}(i, j)) - \text{proximité}(i, j)$$
 
 > [!NOTE]
@@ -116,8 +121,7 @@ $$c_{ij} = \text{insatisfaction}(\text{rang}(i, j)) - \text{proximité}(i, j)$$
 > La meilleure solution est ici d'assigner l'équipe A à la compétition 1 et l'équipe B à la compétition 2. Faire l'autre choix augmente l'insatisfaction de chaque équipe d'au moins 1 point, mais augmente aussi la proximité de chaque équipe. Si l'augmentation de la proximité est inférieur à 1 point, alors le choix optimal est d'assigner chaque équipe à sa compétition préférée, même si elle est plus éloignée.
 
 
-
-## 
+## Execution du code
 
 ### Environnement de développement
 
