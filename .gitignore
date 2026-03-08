@@ -1,5 +1,7 @@
 # Fichier de données
 *.csv
+!choix.csv
+!temps_trajet.csv
 *.xls
 *.xlsx
 

@@ -2,6 +2,23 @@ import numpy as np
 from typing import Union, cast
 
 
+def assign(voeux: np.ndarray, temps_trajet: np.ndarray, tau: float = 2.0) -> np.ndarray:
+    """
+    Fonction principale pour assigner les équipes aux compétitions en fonction de leurs voeux et des temps de trajet.
+    
+    Args:
+        voeux (np.ndarray): Matrice des rangs de choix (1 pour le premier choix, 2 pour le deuxième, etc.)
+        temps_trajet (np.ndarray): Matrice des temps de trajet entre les équipes et les événements.
+        tau (float): La durée qu'il faut ajouter pour diviser la pénalité de proximité par 2.
+            L'unité de temps doit être la même que celle utilisée pour le temps de trajet (par exemple, secondes ou heures).
+    
+    Returns:
+        np.ndarray: Indice de la compétition attribuée à chaque équipe (0 pour la première compétition, 1 pour la deuxième, etc.)
+    """
+    couts = matrice_couts(voeux, temps_trajet, tau)
+    return resolution(couts)
+
+
 def insatisfaction(rang: Union[int, np.ndarray]) -> Union[float, np.ndarray]:
     """
     Calcule l'insatisfaction d'une équipe en fonction du rang du voeu qui lui a été attribué.
@@ -53,7 +70,7 @@ def matrice_couts(voeux: np.ndarray, temps_trajet: np.ndarray, tau: float = 2.0)
 
 def resolution(matrice_couts: np.ndarray) -> np.ndarray:
     """
-    Résout le problème d'affectation en utilisant l'algorithme de Hungarian (ou Munkres) pour trouver l'affectation optimale.
+    Résout le problème d'affectation.
     
     Args:
         matrice_couts (np.ndarray): Matrice des coûts à minimiser.

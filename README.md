@@ -130,6 +130,7 @@ Le projet utilise Python et plusieurs bibliothèques pour le traitement des donn
 ```
 $ conda env create -f environment.yml
 $ conda activate magouilleuse
+$ python run.py
 ```
 
 ### Exécution du projet

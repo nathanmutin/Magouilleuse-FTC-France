@@ -91,47 +91,60 @@ if __name__ == "__main__":
     num_equipes = 155
     num_compets = 7
     
+    assert num_equipes >= 8 * num_compets, "Il doit y avoir au moins 8 équipes par compétition pour que l'assignation soit possible."
+    assert num_equipes <= 24 * num_compets, "Il doit y avoir au maximum 24 équipes par compétition pour que l'assignation soit possible."
+    
     # Genération des positions des compétitions, des équipes, et de la matrice des temps de trajet
     coordonees_compets, coordonees_equipes, matrice_trajets = matrice_distances_aleatoire(num_equipes, num_compets)
     
     # Génération de la matrice des voeux semi-aléatoire
     matrice_voeux = matrice_voeux_semi_aleatoire(matrice_trajets, temperature=2.0)
     
-    # Calcul de la matrice des coûts et résolution du problème d'affectation
-    from magouilleuse import matrice_couts, resolution
-    couts = matrice_couts(matrice_voeux, matrice_trajets, tau=2.0)
-    affectation = resolution(couts)
-
     # Affichage des compétitions et des équipes sur une carte
     # Chaque compétition est représentée par une couleur
     # Le nombre d'équipes inscrites à chaque compétition est indiqué à côté de la compétition
     # Les premiers voeux des équipes sont indiqués par des points de la même couleur
     # Les assignations finales sont indiquées par des cercles autour des équipes
     # Les équipes qui ne sont pas assignées à leur premier choix ont le rang de leur assignation indiqué à côté d'elles
+    #
+    # 1 subplot pour chaque algorithme d'assignation (linéaire et deferred acceptance) pour comparer les résultats
     import matplotlib.pyplot as plt
-    plt.figure(figsize=(8, 8))
-    colors = plt.get_cmap('tab10', num_compets)
-    for j in range(num_compets):
-        plt.scatter(coordonees_compets[j, 0], coordonees_compets[j, 1], color=colors(j), marker='s', s=200, label=f'Compétition {j+1}')
-        plt.text(coordonees_compets[j, 0], coordonees_compets[j, 1], (affectation == j).sum(), fontsize=12, ha='center', va='center', color='white')
-        plt.scatter(coordonees_equipes[matrice_voeux[:, j] == 1, 0], coordonees_equipes[matrice_voeux[:, j] == 1, 1], color=colors(j), alpha=0.5)
-        plt.scatter(coordonees_equipes[affectation == j, 0], coordonees_equipes[affectation == j, 1], facecolors='none', edgecolors=colors(j), s=100, label=f'Assignées à Compétition {j+1}')
-    for i in range(num_equipes):
-        if affectation[i] != np.argmin(matrice_voeux[i]):
-            plt.text(coordonees_equipes[i, 0], coordonees_equipes[i, 1], str(matrice_voeux[i, affectation[i]]), fontsize=8, ha='center', va='center')
+    plt.figure(figsize=(15, 7))
     
-    # Création des entrées de légende personnalisées
-    from matplotlib.lines import Line2D
-    legend_elements = [
-        Line2D([0], [0], marker='s', color='w', markerfacecolor='gray', markersize=10, label='Compétition'),
-        Line2D([0], [0], marker='o', color='w', markerfacecolor='gray', markersize=8, alpha=0.5, label='Premier choix'),
-        Line2D([0], [0], marker='o', color='w', markerfacecolor='w', markeredgecolor='gray', markersize=8, label='Assignation finale')
-    ]
-    plt.legend(handles=legend_elements, loc='best')
-    
-    plt.title("Positions des compétitions et des équipes")
-    plt.xlabel("Coordonnée X (heures)")
-    plt.ylabel("Coordonnée Y (heures)")
-    plt.grid(True)
-    plt.show()
+    for algo in ["Linear Problem", "Deferred Acceptance"]:
+
+        # Calcul de la matrice des coûts et résolution du problème d'affectation
+        if algo == "Linear Problem":
+            import src.linear_problem
+            affectation = src.linear_problem.assign(matrice_voeux, matrice_trajets)
+        else:
+            import src.deferred_acceptance
+            affectation = src.deferred_acceptance.assign(matrice_voeux, matrice_trajets)
+        
+        plt.subplot(1, 2, 1 if algo == "Linear Problem" else 2)
+        colors = plt.get_cmap('tab10', num_compets)
+        for j in range(num_compets):
+            plt.scatter(coordonees_compets[j, 0], coordonees_compets[j, 1], color=colors(j), marker='s', s=200, label=f'Compétition {j+1}')
+            plt.text(coordonees_compets[j, 0], coordonees_compets[j, 1], (affectation == j).sum(), fontsize=12, ha='center', va='center', color='white')
+            plt.scatter(coordonees_equipes[matrice_voeux[:, j] == 1, 0], coordonees_equipes[matrice_voeux[:, j] == 1, 1], color=colors(j), alpha=0.5)
+            plt.scatter(coordonees_equipes[affectation == j, 0], coordonees_equipes[affectation == j, 1], facecolors='none', edgecolors=colors(j), s=100, label=f'Assignées à Compétition {j+1}')
+        for i in range(num_equipes):
+            if affectation[i] != np.argmin(matrice_voeux[i]):
+                plt.text(coordonees_equipes[i, 0], coordonees_equipes[i, 1], str(matrice_voeux[i, affectation[i]]), fontsize=8, ha='center', va='center')
+        
+        # Création des entrées de légende personnalisées
+        from matplotlib.lines import Line2D
+        legend_elements = [
+            Line2D([0], [0], marker='s', color='w', markerfacecolor='gray', markersize=10, label='Compétition'),
+            Line2D([0], [0], marker='o', color='w', markerfacecolor='gray', markersize=8, alpha=0.5, label='Premier choix'),
+            Line2D([0], [0], marker='o', color='w', markerfacecolor='w', markeredgecolor='gray', markersize=8, label='Assignation finale')
+        ]
+        plt.legend(handles=legend_elements, loc='best')
+        
+        plt.title(algo)
+        plt.xlabel("Coordonnée X (heures)")
+        plt.ylabel("Coordonnée Y (heures)")
+        plt.grid(True)
+
+plt.show()
     
